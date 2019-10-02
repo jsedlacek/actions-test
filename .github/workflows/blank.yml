@@ -6,12 +6,15 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    
+
+    services:
+      elasticsearch:
+        image: elasticsearch
+        ports:
+        - 9200/tcp
+        options: -e="discovery.type=single-node" --health-cmd="curl http://localhost:9200/_cluster/health" --health-interval=10s --health-timeout=5s --health-retries=10
+
     steps:
     - uses: actions/checkout@v1
     - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
-      run: |
-        echo Add other actions to build,
-        echo test, and deploy your project.
+      run: curl http://localhost:${{ job.services.elasticsearch.ports[9200] }}/_cluster/health
